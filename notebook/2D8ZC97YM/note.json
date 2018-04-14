@@ -1,0 +1,113 @@
+{
+  "paragraphs": [
+    {
+      "text": "import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}\nimport org.apache.spark.sql.functions._ // for lit(), first(), etc.\n\ncase class MatchData(\n  id_1: Int,\n  id_2: Int,\n  cmp_fname_c1: Option[Double],\n  cmp_fname_c2: Option[Double],\n  cmp_lname_c1: Option[Double],\n  cmp_lname_c2: Option[Double],\n  cmp_sex: Option[Int],\n  cmp_bd: Option[Int],\n  cmp_bm: Option[Int],\n  cmp_by: Option[Int],\n  cmp_plz: Option[Int],\n  is_match: Boolean\n)\n\n",
+      "user": "anonymous",
+      "dateUpdated": "Mar 25, 2018 6:43:50 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}\nimport org.apache.spark.sql.functions._\ndefined class MatchData\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1521971010356_572937805",
+      "id": "20180325-184330_858486395",
+      "dateCreated": "Mar 25, 2018 6:43:30 PM",
+      "dateStarted": "Mar 25, 2018 6:43:50 PM",
+      "dateFinished": "Mar 25, 2018 6:43:51 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "    import spark.implicits._\n \n    val preview \u003d spark.read.csv(\"hdfs://localhost:9000/user/ds/linkage\")\n    preview.show()\n    preview.printSchema()\n\n",
+      "user": "anonymous",
+      "dateUpdated": "Mar 25, 2018 6:47:57 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "ERROR",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import spark.implicits._\njava.net.ConnectException: Call From MacBook-2.local/192.168.2.100 to localhost:9000 failed on connection exception: java.net.ConnectException: Connection refused; For more details see:  http://wiki.apache.org/hadoop/ConnectionRefused\n  at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)\n  at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)\n  at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)\n  at java.lang.reflect.Constructor.newInstance(Constructor.java:423)\n  at org.apache.hadoop.net.NetUtils.wrapWithMessage(NetUtils.java:791)\n  at org.apache.hadoop.net.NetUtils.wrapException(NetUtils.java:731)\n  at org.apache.hadoop.ipc.Client.call(Client.java:1472)\n  at org.apache.hadoop.ipc.Client.call(Client.java:1399)\n  at org.apache.hadoop.ipc.ProtobufRpcEngine$Invoker.invoke(ProtobufRpcEngine.java:232)\n  at com.sun.proxy.$Proxy31.getFileInfo(Unknown Source)\n  at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.getFileInfo(ClientNamenodeProtocolTranslatorPB.java:752)\n  at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n  at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)\n  at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n  at java.lang.reflect.Method.invoke(Method.java:498)\n  at org.apache.hadoop.io.retry.RetryInvocationHandler.invokeMethod(RetryInvocationHandler.java:187)\n  at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java:102)\n  at com.sun.proxy.$Proxy32.getFileInfo(Unknown Source)\n  at org.apache.hadoop.hdfs.DFSClient.getFileInfo(DFSClient.java:1988)\n  at org.apache.hadoop.hdfs.DistributedFileSystem$18.doCall(DistributedFileSystem.java:1118)\n  at org.apache.hadoop.hdfs.DistributedFileSystem$18.doCall(DistributedFileSystem.java:1114)\n  at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java:81)\n  at org.apache.hadoop.hdfs.DistributedFileSystem.getFileStatus(DistributedFileSystem.java:1114)\n  at org.apache.hadoop.fs.FileSystem.exists(FileSystem.java:1400)\n  at org.apache.spark.sql.execution.datasources.DataSource$$anonfun$14.apply(DataSource.scala:381)\n  at org.apache.spark.sql.execution.datasources.DataSource$$anonfun$14.apply(DataSource.scala:370)\n  at scala.collection.TraversableLike$$anonfun$flatMap$1.apply(TraversableLike.scala:241)\n  at scala.collection.TraversableLike$$anonfun$flatMap$1.apply(TraversableLike.scala:241)\n  at scala.collection.immutable.List.foreach(List.scala:381)\n  at scala.collection.TraversableLike$class.flatMap(TraversableLike.scala:241)\n  at scala.collection.immutable.List.flatMap(List.scala:344)\n  at org.apache.spark.sql.execution.datasources.DataSource.resolveRelation(DataSource.scala:370)\n  at org.apache.spark.sql.DataFrameReader.load(DataFrameReader.scala:152)\n  at org.apache.spark.sql.DataFrameReader.csv(DataFrameReader.scala:415)\n  at org.apache.spark.sql.DataFrameReader.csv(DataFrameReader.scala:352)\n  ... 60 elided\nCaused by: java.net.ConnectException: Connection refused\n  at sun.nio.ch.SocketChannelImpl.checkConnect(Native Method)\n  at sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:717)\n  at org.apache.hadoop.net.SocketIOWithTimeout.connect(SocketIOWithTimeout.java:206)\n  at org.apache.hadoop.net.NetUtils.connect(NetUtils.java:530)\n  at org.apache.hadoop.net.NetUtils.connect(NetUtils.java:494)\n  at org.apache.hadoop.ipc.Client$Connection.setupConnection(Client.java:607)\n  at org.apache.hadoop.ipc.Client$Connection.setupIOstreams(Client.java:705)\n  at org.apache.hadoop.ipc.Client$Connection.access$2800(Client.java:368)\n  at org.apache.hadoop.ipc.Client.getConnection(Client.java:1521)\n  at org.apache.hadoop.ipc.Client.call(Client.java:1438)\n  ... 88 more\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1521971030137_-1796700023",
+      "id": "20180325-184350_670863504",
+      "dateCreated": "Mar 25, 2018 6:43:50 PM",
+      "dateStarted": "Mar 25, 2018 6:47:57 PM",
+      "dateFinished": "Mar 25, 2018 6:48:00 PM",
+      "status": "ERROR",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "user": "anonymous",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1521971053241_-388272217",
+      "id": "20180325-184413_2067207267",
+      "dateCreated": "Mar 25, 2018 6:44:13 PM",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "ch02",
+  "id": "2D8ZC97YM",
+  "angularObjects": {
+    "2D7WVA7DP:shared_process": [],
+    "2D8127K51:shared_process": [],
+    "2DAH8MCQQ:shared_process": [],
+    "2DA7VW7D9:shared_process": [],
+    "2D7SA3PEP:shared_process": [],
+    "2D9RY9QEZ:shared_process": [],
+    "2D96W95K3:shared_process": [],
+    "2D7J3WG1H:shared_process": [],
+    "2D9WAHUGF:shared_process": [],
+    "2D6SPY2GB:shared_process": [],
+    "2DA3DYXHT:shared_process": [],
+    "2D9XUWQTF:shared_process": [],
+    "2D94HTQW7:shared_process": [],
+    "2DA9U4RMQ:shared_process": [],
+    "2DA7SJDJD:shared_process": [],
+    "2D89ZDQ9K:shared_process": [],
+    "2DA9RTG8T:shared_process": [],
+    "2D7T1QYFQ:shared_process": [],
+    "2D83QM6FT:shared_process": []
+  },
+  "config": {},
+  "info": {}
+}

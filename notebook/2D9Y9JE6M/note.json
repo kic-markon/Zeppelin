@@ -1,0 +1,183 @@
+{
+  "paragraphs": [
+    {
+      "text": "import spray.json.JsValue",
+      "user": "anonymous",
+      "dateUpdated": "Mar 13, 2018 7:37:04 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import spray.json.JsValue\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1520937324139_-1718492165",
+      "id": "20180313-193524_734445521",
+      "dateCreated": "Mar 13, 2018 7:35:24 PM",
+      "dateStarted": "Mar 13, 2018 7:37:04 PM",
+      "dateFinished": "Mar 13, 2018 7:37:05 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "case class Feature(\n    val id: Option[spray.json.JsValue],\n    val properties: Map[String,spray.json.JsValue],\n    val geometry: RichGeometry) {\n        def apply(property: String) \u003d properties(property)\n        def get(property: String) \u003d properties.get(property)\n    }",
+      "user": "anonymous",
+      "dateUpdated": "Mar 13, 2018 7:40:20 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "ERROR",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u003cconsole\u003e:14: error: not found: type RichGeometry\n           val geometry: RichGeometry) {\n                         ^\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1520937424783_-2134635589",
+      "id": "20180313-193704_859093711",
+      "dateCreated": "Mar 13, 2018 7:37:04 PM",
+      "dateStarted": "Mar 13, 2018 7:40:20 PM",
+      "dateFinished": "Mar 13, 2018 7:40:20 PM",
+      "status": "ERROR",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "import spray.json._",
+      "user": "anonymous",
+      "dateUpdated": "Mar 13, 2018 7:51:14 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import spray.json._\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1520937584914_660205613",
+      "id": "20180313-193944_1318938786",
+      "dateCreated": "Mar 13, 2018 7:39:44 PM",
+      "dateStarted": "Mar 13, 2018 7:51:14 PM",
+      "dateFinished": "Mar 13, 2018 7:51:15 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "case class Feature(\n    val id: Option[JsValue],\n    val properties: Map[String,JsValue],\n    val geometry: RichGeometry) {\n        def apply(property: String) \u003d properties(property)\n        def get(property: String) \u003d properties.get(property)\n    }",
+      "user": "anonymous",
+      "dateUpdated": "Mar 13, 2018 7:51:46 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "ERROR",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u003cconsole\u003e:12: error: not found: type JsValue\n           val id: Option[JsValue],\n                          ^\n\u003cconsole\u003e:13: error: not found: type JsValue\n           val properties: Map[String,JsValue],\n                                      ^\n\u003cconsole\u003e:14: error: not found: type RichGeometry\n           val geometry: RichGeometry) {\n                         ^\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1520938274936_-344794096",
+      "id": "20180313-195114_430458671",
+      "dateCreated": "Mar 13, 2018 7:51:14 PM",
+      "dateStarted": "Mar 13, 2018 7:51:46 PM",
+      "dateFinished": "Mar 13, 2018 7:51:46 PM",
+      "status": "ERROR",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "user": "anonymous",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1520938291379_2018749046",
+      "id": "20180313-195131_1070062556",
+      "dateCreated": "Mar 13, 2018 7:51:31 PM",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "test",
+  "id": "2D9Y9JE6M",
+  "angularObjects": {
+    "2D7WVA7DP:shared_process": [],
+    "2D8127K51:shared_process": [],
+    "2DAH8MCQQ:shared_process": [],
+    "2DA7VW7D9:shared_process": [],
+    "2D7SA3PEP:shared_process": [],
+    "2D9RY9QEZ:shared_process": [],
+    "2D96W95K3:shared_process": [],
+    "2D7J3WG1H:shared_process": [],
+    "2D9WAHUGF:shared_process": [],
+    "2D6SPY2GB:shared_process": [],
+    "2DA3DYXHT:shared_process": [],
+    "2D9XUWQTF:shared_process": [],
+    "2D94HTQW7:shared_process": [],
+    "2DA9U4RMQ:shared_process": [],
+    "2DA7SJDJD:shared_process": [],
+    "2D89ZDQ9K:shared_process": [],
+    "2DA9RTG8T:shared_process": [],
+    "2D7T1QYFQ:shared_process": [],
+    "2D83QM6FT:shared_process": []
+  },
+  "config": {},
+  "info": {}
+}
