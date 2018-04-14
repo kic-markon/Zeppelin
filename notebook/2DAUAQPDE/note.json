@@ -1,6 +1,44 @@
 {
   "paragraphs": [
     {
+      "text": "%md\nThe following example is taken from:\nAdvanced Analytics with Spark, 2nd Edition\nby Sandy Ryza, Uri Laserson, Sean Owen and Josh Wills\n(c) O\u0027Reilly, 2017\n\nInitial steps in the \"Taxicab\" problem with Scala.",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 10:35:34 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThe following example is taken from:\u003cbr/\u003eAdvanced Analytics with Spark, 2nd Edition\u003cbr/\u003eby Sandy Ryza, Uri Laserson, Sean Owen and Josh Wills\u003cbr/\u003e(c) O\u0026rsquo;Reilly, 2017\u003c/p\u003e\n\u003cp\u003eInitial steps in the \u0026ldquo;Taxicab\u0026rdquo; problem with Scala.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1523712914158_-864487273",
+      "id": "20180414-223514_1104425339",
+      "dateCreated": "Apr 14, 2018 10:35:14 PM",
+      "dateStarted": "Apr 14, 2018 10:35:34 PM",
+      "dateFinished": "Apr 14, 2018 10:35:34 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
       "text": "/*\n * Copyright 2015 and onwards Sanford Ryza, Uri Laserson, Sean Owen and Joshua Wills\n *\n * See LICENSE file for further information.\n */\n\n//package com.cloudera.datascience.geotime\n\nimport java.text.SimpleDateFormat\nimport java.util.Locale\nimport java.util.concurrent.TimeUnit\n\nimport org.apache.spark.sql.{DataFrame, Row, SparkSession}\nimport org.apache.spark.sql.functions._\n\nimport com.esri.core.geometry.Point\nimport spray.json._\n\nimport com.cloudera.datascience.geotime.GeoJsonProtocol._\n\n\nclass RichRow(row: Row) {\n  def getAs[T](field: String): Option[T] \u003d\n    if (row.isNullAt(row.fieldIndex(field))) None else Some(row.getAs[T](field))\n}\n\ncase class Trip(\n  license: String,\n  pickupTime: Long,\n  dropoffTime: Long,\n  pickupX: Double,\n  pickupY: Double,\n  dropoffX: Double,\n  dropoffY: Double)\n\nobject RunGeoTime extends Serializable {\n\n  def main(args: Array[String]): Unit \u003d {\n    val spark \u003d SparkSession.builder().getOrCreate()\n    import spark.implicits._\n\n    val taxiRaw \u003d spark.read.option(\"header\", \"true\").csv(\"/Users/markon/ITU/taxidata\")\n    val taxiParsed \u003d taxiRaw.rdd.map(safe(parse))\n    val taxiGood \u003d taxiParsed.map(_.left.get).toDS\n    taxiGood.cache()\n\n    val hours \u003d (pickup: Long, dropoff: Long) \u003d\u003e {\n      TimeUnit.HOURS.convert(dropoff - pickup, TimeUnit.MILLISECONDS)\n    }\n    val hoursUDF \u003d udf(hours)\n\n    taxiGood.groupBy(hoursUDF($\"pickupTime\", $\"dropoffTime\").as(\"h\")).count().sort(\"h\").show()\n\n    // register the UDF, use it in a where clause\n    spark.udf.register(\"hours\", hours)\n    val taxiClean \u003d taxiGood.where(\"hours(pickupTime, dropoffTime) BETWEEN 0 AND 3\")\n\n    val geojson \u003d scala.io.Source.fromURL(this.getClass.getResource(\"/nyc-boroughs.geojson\")).mkString\n\n    val features \u003d geojson.parseJson.convertTo[FeatureCollection]\n    val areaSortedFeatures \u003d features.sortBy { f \u003d\u003e \n      val borough \u003d f(\"boroughCode\").convertTo[Int]\n      (borough, -f.geometry.area2D())\n    }\n\n    val bFeatures \u003d spark.sparkContext.broadcast(areaSortedFeatures)\n\n    val bLookup \u003d (x: Double, y: Double) \u003d\u003e {\n      val feature: Option[Feature] \u003d bFeatures.value.find(f \u003d\u003e {\n        f.geometry.contains(new Point(x, y))\n      })\n      feature.map(f \u003d\u003e {\n        f(\"borough\").convertTo[String]\n      }).getOrElse(\"NA\")\n    }\n    val boroughUDF \u003d udf(bLookup)\n\n    taxiClean.groupBy(boroughUDF($\"dropoffX\", $\"dropoffY\")).count().show()\n    val taxiDone \u003d taxiClean.where(\"dropoffX !\u003d 0 and dropoffY !\u003d 0 and pickupX !\u003d 0 and pickupY !\u003d 0\")\n    taxiDone.groupBy(boroughUDF($\"dropoffX\", $\"dropoffY\")).count().show()\n\n    taxiGood.unpersist()\n\n    val sessions \u003d taxiDone.\n        repartition($\"license\").\n        sortWithinPartitions($\"license\", $\"pickupTime\").\n        cache()\n    def boroughDuration(t1: Trip, t2: Trip): (String, Long) \u003d {\n      val b \u003d bLookup(t1.dropoffX, t1.dropoffY)\n      val d \u003d (t2.pickupTime - t1.dropoffTime) / 1000\n      (b, d)\n    }\n\n    val boroughDurations: DataFrame \u003d\n      sessions.mapPartitions(trips \u003d\u003e {\n        val iter: Iterator[Seq[Trip]] \u003d trips.sliding(2)\n        val viter \u003d iter.filter(_.size \u003d\u003d 2).filter(p \u003d\u003e p(0).license \u003d\u003d p(1).license)\n        viter.map(p \u003d\u003e boroughDuration(p(0), p(1)))\n      }).toDF(\"borough\", \"seconds\")\n    boroughDurations.\n      where(\"seconds \u003e 0\").\n      groupBy(\"borough\").\n      agg(avg(\"seconds\"), stddev(\"seconds\")).\n      show()\n\n    boroughDurations.unpersist()\n  }\n\n  def safe[S, T](f: S \u003d\u003e T): S \u003d\u003e Either[T, (S, Exception)] \u003d {\n    new Function[S, Either[T, (S, Exception)]] with Serializable {\n      def apply(s: S): Either[T, (S, Exception)] \u003d {\n        try {\n          Left(f(s))\n        } catch {\n          case e: Exception \u003d\u003e Right((s, e))\n        }\n      }\n    }\n  }\n\n  def parseTaxiTime(rr: RichRow, timeField: String): Long \u003d {\n    val formatter \u003d new SimpleDateFormat(\n       \"yyyy-MM-dd HH:mm:ss\", Locale.ENGLISH)\n    val optDt \u003d rr.getAs[String](timeField)\n    optDt.map(dt \u003d\u003e formatter.parse(dt).getTime).getOrElse(0L)\n  }\n\n  def parseTaxiLoc(rr: RichRow, locField: String): Double \u003d {\n    rr.getAs[String](locField).map(_.toDouble).getOrElse(0.0)\n  }\n\n  def parse(line: Row): Trip \u003d {\n    val rr \u003d new RichRow(line)\n    Trip(\n      license \u003d rr.getAs[String](\"hack_license\").orNull,\n      pickupTime \u003d parseTaxiTime(rr, \"pickup_datetime\"),\n      dropoffTime \u003d parseTaxiTime(rr, \"dropoff_datetime\"),\n      pickupX \u003d parseTaxiLoc(rr, \"pickup_longitude\"),\n      pickupY \u003d parseTaxiLoc(rr, \"pickup_latitude\"),\n      dropoffX \u003d parseTaxiLoc(rr, \"dropoff_longitude\"),\n      dropoffY \u003d parseTaxiLoc(rr, \"dropoff_latitude\")\n    )\n  }\n}\n",
       "user": "anonymous",
       "dateUpdated": "Mar 13, 2018 11:32:19 AM",
@@ -333,25 +371,24 @@
   "name": "taxicab",
   "id": "2DAUAQPDE",
   "angularObjects": {
-    "2D7WVA7DP:shared_process": [],
-    "2D8127K51:shared_process": [],
-    "2DAH8MCQQ:shared_process": [],
-    "2DA7VW7D9:shared_process": [],
-    "2D7SA3PEP:shared_process": [],
-    "2D9RY9QEZ:shared_process": [],
-    "2D96W95K3:shared_process": [],
-    "2D7J3WG1H:shared_process": [],
-    "2D9WAHUGF:shared_process": [],
-    "2D6SPY2GB:shared_process": [],
-    "2DA3DYXHT:shared_process": [],
-    "2D9XUWQTF:shared_process": [],
-    "2D94HTQW7:shared_process": [],
-    "2DA9U4RMQ:shared_process": [],
-    "2DA7SJDJD:shared_process": [],
-    "2D89ZDQ9K:shared_process": [],
-    "2DA9RTG8T:shared_process": [],
-    "2D7T1QYFQ:shared_process": [],
-    "2D83QM6FT:shared_process": []
+    "2DDH2WQSB:shared_process": [],
+    "2DBBSXRRW:shared_process": [],
+    "2DAPSSHCT:shared_process": [],
+    "2DCR57YCT:shared_process": [],
+    "2DAXDMBAJ:shared_process": [],
+    "2DBRX1AQT:shared_process": [],
+    "2DDRKEEGG:shared_process": [],
+    "2DBUPDJFC:shared_process": [],
+    "2DCE5XZDR:shared_process": [],
+    "2DBVYT3CU:shared_process": [],
+    "2DD3TM72G:shared_process": [],
+    "2DAYVGWBM:shared_process": [],
+    "2DAVW3PTU:shared_process": [],
+    "2DDVJ4SYP:shared_process": [],
+    "2DA9JSGRJ:shared_process": [],
+    "2DBFUDA3G:shared_process": [],
+    "2DDX9CBD7:shared_process": [],
+    "2DCGM69PY:shared_process": []
   },
   "config": {},
   "info": {}

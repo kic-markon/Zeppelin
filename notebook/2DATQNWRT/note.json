@@ -1,6 +1,44 @@
 {
   "paragraphs": [
     {
+      "text": "%md\nThe following example is taken from:\nAdvanced Analytics with Spark, 2nd Edition\nby Sandy Ryza, Uri Laserson, Sean Owen and Josh Wills\n(c) O\u0027Reilly, 2017\n\nSmall example for getting familiar with Scala",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 10:33:36 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThe following example is taken from:\u003cbr/\u003eAdvanced Analytics with Spark, 2nd Edition\u003cbr/\u003eby Sandy Ryza, Uri Laserson, Sean Owen and Josh Wills\u003cbr/\u003e(c) O\u0026rsquo;Reilly, 2017\u003c/p\u003e\n\u003cp\u003eSmall example for getting familiar with Scala\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1523712739446_-1950461563",
+      "id": "20180414-223219_964140193",
+      "dateCreated": "Apr 14, 2018 10:32:19 PM",
+      "dateStarted": "Apr 14, 2018 10:33:36 PM",
+      "dateFinished": "Apr 14, 2018 10:33:37 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
       "text": "import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}\nimport org.apache.spark.sql.functions._ // for lit(), first(), etc.\n\ncase class MatchData(\n  id_1: Int,\n  id_2: Int,\n  cmp_fname_c1: Option[Double],\n  cmp_fname_c2: Option[Double],\n  cmp_lname_c1: Option[Double],\n  cmp_lname_c2: Option[Double],\n  cmp_sex: Option[Int],\n  cmp_bd: Option[Int],\n  cmp_bm: Option[Int],\n  cmp_by: Option[Int],\n  cmp_plz: Option[Int],\n  is_match: Boolean\n)\n",
       "user": "anonymous",
       "dateUpdated": "Mar 24, 2018 11:32:46 PM",
@@ -421,46 +459,19 @@
       "progressUpdateIntervalMs": 500
     },
     {
-      "text": "%file\n\nls /user/ds/linkage",
+      "text": "",
       "user": "anonymous",
-      "dateUpdated": "Mar 25, 2018 7:01:54 PM",
+      "dateUpdated": "Apr 14, 2018 10:32:11 PM",
       "config": {
         "colWidth": 12.0,
         "enabled": true,
         "results": {},
         "editorSetting": {
-          "language": "scala",
-          "editOnDblClick": false
+          "language": "markdown",
+          "editOnDblClick": true
         },
-        "editorMode": "ace/mode/undefined"
+        "editorMode": "ace/mode/markdown"
       },
-      "settings": {
-        "params": {},
-        "forms": {}
-      },
-      "results": {
-        "code": "SUCCESS",
-        "msg": [
-          {
-            "type": "TEXT",
-            "data": "No such File or directory"
-          }
-        ]
-      },
-      "apps": [],
-      "jobName": "paragraph_1521905888303_-1768030969",
-      "id": "20180325-003808_525967121",
-      "dateCreated": "Mar 25, 2018 12:38:08 AM",
-      "dateStarted": "Mar 25, 2018 7:01:55 PM",
-      "dateFinished": "Mar 25, 2018 7:01:55 PM",
-      "status": "FINISHED",
-      "progressUpdateIntervalMs": 500
-    },
-    {
-      "text": "%file\n",
-      "user": "anonymous",
-      "dateUpdated": "Mar 25, 2018 10:40:37 AM",
-      "config": {},
       "settings": {
         "params": {},
         "forms": {}
@@ -476,25 +487,24 @@
   "name": "Scala_Intro",
   "id": "2DATQNWRT",
   "angularObjects": {
-    "2D7WVA7DP:shared_process": [],
-    "2D8127K51:shared_process": [],
-    "2DAH8MCQQ:shared_process": [],
-    "2DA7VW7D9:shared_process": [],
-    "2D7SA3PEP:shared_process": [],
-    "2D9RY9QEZ:shared_process": [],
-    "2D96W95K3:shared_process": [],
-    "2D7J3WG1H:shared_process": [],
-    "2D9WAHUGF:shared_process": [],
-    "2D6SPY2GB:shared_process": [],
-    "2DA3DYXHT:shared_process": [],
-    "2D9XUWQTF:shared_process": [],
-    "2D94HTQW7:shared_process": [],
-    "2DA9U4RMQ:shared_process": [],
-    "2DA7SJDJD:shared_process": [],
-    "2D89ZDQ9K:shared_process": [],
-    "2DA9RTG8T:shared_process": [],
-    "2D7T1QYFQ:shared_process": [],
-    "2D83QM6FT:shared_process": []
+    "2DDH2WQSB:shared_process": [],
+    "2DBBSXRRW:shared_process": [],
+    "2DAPSSHCT:shared_process": [],
+    "2DCR57YCT:shared_process": [],
+    "2DAXDMBAJ:shared_process": [],
+    "2DBRX1AQT:shared_process": [],
+    "2DDRKEEGG:shared_process": [],
+    "2DBUPDJFC:shared_process": [],
+    "2DCE5XZDR:shared_process": [],
+    "2DBVYT3CU:shared_process": [],
+    "2DD3TM72G:shared_process": [],
+    "2DAYVGWBM:shared_process": [],
+    "2DAVW3PTU:shared_process": [],
+    "2DDVJ4SYP:shared_process": [],
+    "2DA9JSGRJ:shared_process": [],
+    "2DBFUDA3G:shared_process": [],
+    "2DDX9CBD7:shared_process": [],
+    "2DCGM69PY:shared_process": []
   },
   "config": {},
   "info": {}

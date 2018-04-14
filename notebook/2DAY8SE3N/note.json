@@ -1,6 +1,44 @@
 {
   "paragraphs": [
     {
+      "text": "%md\nThe following example is taken from:\nAdvanced Analytics with Spark, 2nd Edition\nby Sandy Ryza, Uri Laserson, Sean Owen and Josh Wills\n(c) O\u0027Reilly, 2017\n\nInitial steps for creating a Random Forest Classifier for the \"Forest Cover\" problem.",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 10:34:33 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThe following example is taken from:\u003cbr/\u003eAdvanced Analytics with Spark, 2nd Edition\u003cbr/\u003eby Sandy Ryza, Uri Laserson, Sean Owen and Josh Wills\u003cbr/\u003e(c) O\u0026rsquo;Reilly, 2017\u003c/p\u003e\n\u003cp\u003eInitial steps for creating a Random Forest Classifier for the \u0026ldquo;Forest Cover\u0026rdquo; problem.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1523712828873_37440770",
+      "id": "20180414-223348_355150027",
+      "dateCreated": "Apr 14, 2018 10:33:48 PM",
+      "dateStarted": "Apr 14, 2018 10:34:33 PM",
+      "dateFinished": "Apr 14, 2018 10:34:33 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
       "text": "import org.apache.spark.ml.{PipelineModel, Pipeline}\nimport org.apache.spark.ml.classification.{DecisionTreeClassifier,\n  RandomForestClassifier, RandomForestClassificationModel}\nimport org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator\nimport org.apache.spark.ml.feature.{VectorAssembler, VectorIndexer}\nimport org.apache.spark.ml.linalg.Vector\nimport org.apache.spark.ml.tuning.{ParamGridBuilder, TrainValidationSplit}\nimport org.apache.spark.mllib.evaluation.MulticlassMetrics\nimport org.apache.spark.sql.{DataFrame, SparkSession}\nimport org.apache.spark.sql.functions._\nimport scala.util.Random\n",
       "user": "anonymous",
       "dateUpdated": "Mar 22, 2018 10:13:18 PM",
@@ -232,25 +270,24 @@
   "name": "Forest",
   "id": "2DAY8SE3N",
   "angularObjects": {
-    "2D7WVA7DP:shared_process": [],
-    "2D8127K51:shared_process": [],
-    "2DAH8MCQQ:shared_process": [],
-    "2DA7VW7D9:shared_process": [],
-    "2D7SA3PEP:shared_process": [],
-    "2D9RY9QEZ:shared_process": [],
-    "2D96W95K3:shared_process": [],
-    "2D7J3WG1H:shared_process": [],
-    "2D9WAHUGF:shared_process": [],
-    "2D6SPY2GB:shared_process": [],
-    "2DA3DYXHT:shared_process": [],
-    "2D9XUWQTF:shared_process": [],
-    "2D94HTQW7:shared_process": [],
-    "2DA9U4RMQ:shared_process": [],
-    "2DA7SJDJD:shared_process": [],
-    "2D89ZDQ9K:shared_process": [],
-    "2DA9RTG8T:shared_process": [],
-    "2D7T1QYFQ:shared_process": [],
-    "2D83QM6FT:shared_process": []
+    "2DDH2WQSB:shared_process": [],
+    "2DBBSXRRW:shared_process": [],
+    "2DAPSSHCT:shared_process": [],
+    "2DCR57YCT:shared_process": [],
+    "2DAXDMBAJ:shared_process": [],
+    "2DBRX1AQT:shared_process": [],
+    "2DDRKEEGG:shared_process": [],
+    "2DBUPDJFC:shared_process": [],
+    "2DCE5XZDR:shared_process": [],
+    "2DBVYT3CU:shared_process": [],
+    "2DD3TM72G:shared_process": [],
+    "2DAYVGWBM:shared_process": [],
+    "2DAVW3PTU:shared_process": [],
+    "2DDVJ4SYP:shared_process": [],
+    "2DA9JSGRJ:shared_process": [],
+    "2DBFUDA3G:shared_process": [],
+    "2DDX9CBD7:shared_process": [],
+    "2DCGM69PY:shared_process": []
   },
   "config": {},
   "info": {}
