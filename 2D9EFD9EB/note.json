@@ -1,0 +1,78 @@
+{
+  "paragraphs": [
+    {
+      "text": "/*\n * Copyright 2015 and onwards Sanford Ryza, Uri Laserson, Sean Owen and Joshua Wills\n *\n * See LICENSE file for further information.\n */\n//package com.cloudera.datascience.geotime\n\nimport com.esri.core.geometry.{Geometry, GeometryEngine}\n\nimport spray.json._\n\ncase class Feature(id: Option[JsValue],\n                   properties: Map[String, JsValue],\n                   geometry: RichGeometry) {\n  def apply(property: String): JsValue \u003d properties(property)\n  def get(property: String): Option[JsValue] \u003d properties.get(property)\n}\n\ncase class FeatureCollection(features: Array[Feature])\n    extends IndexedSeq[Feature] {\n  def apply(index: Int): Feature \u003d features(index)\n  def length: Int \u003d features.length\n}\n\ncase class GeometryCollection(geometries: Array[RichGeometry])\n    extends IndexedSeq[RichGeometry] {\n  def apply(index: Int): RichGeometry \u003d geometries(index)\n  def length: Int \u003d geometries.length\n}\n\nobject GeoJsonProtocol extends DefaultJsonProtocol {\n  implicit object RichGeometryJsonFormat extends RootJsonFormat[RichGeometry] {\n    def write(g: RichGeometry): JsValue \u003d {\n      GeometryEngine.geometryToGeoJson(g.spatialReference, g.geometry).parseJson\n    }\n    def read(value: JsValue): RichGeometry \u003d {\n      val mg \u003d GeometryEngine.geometryFromGeoJson(value.compactPrint, 0, Geometry.Type.Unknown)\n      new RichGeometry(mg.getGeometry, mg.getSpatialReference)\n    }\n  }\n\n  implicit object FeatureJsonFormat extends RootJsonFormat[Feature] {\n    def write(f: Feature): JsObject \u003d {\n      val buf \u003d scala.collection.mutable.ArrayBuffer(\n        \"type\" -\u003e JsString(\"Feature\"),\n        \"properties\" -\u003e JsObject(f.properties),\n        \"geometry\" -\u003e f.geometry.toJson)\n      f.id.foreach(v \u003d\u003e { buf +\u003d \"id\" -\u003e v})\n      JsObject(buf.toMap)\n    }\n\n    def read(value: JsValue): Feature \u003d {\n      val jso \u003d value.asJsObject\n      val id \u003d jso.fields.get(\"id\")\n      val properties \u003d jso.fields(\"properties\").asJsObject.fields\n      val geometry \u003d jso.fields(\"geometry\").convertTo[RichGeometry]\n      Feature(id, properties, geometry)\n    }\n  }\n\n  implicit object FeatureCollectionJsonFormat extends RootJsonFormat[FeatureCollection] {\n    def write(fc: FeatureCollection): JsObject \u003d {\n      JsObject(\n        \"type\" -\u003e JsString(\"FeatureCollection\"),\n        \"features\" -\u003e JsArray(fc.features.map(_.toJson): _*)\n      )\n    }\n\n    def read(value: JsValue): FeatureCollection \u003d {\n      FeatureCollection(value.asJsObject.fields(\"features\").convertTo[Array[Feature]])\n    }\n  }\n\n  implicit object GeometryCollectionJsonFormat extends RootJsonFormat[GeometryCollection] {\n    def write(gc: GeometryCollection): JsObject \u003d {\n      JsObject(\n        \"type\" -\u003e JsString(\"GeometryCollection\"),\n        \"geometries\" -\u003e JsArray(gc.geometries.map(_.toJson): _*))\n    }\n\n    def read(value: JsValue): GeometryCollection \u003d {\n      GeometryCollection(value.asJsObject.fields(\"geometries\").convertTo[Array[RichGeometry]])\n    }\n  }\n}\n",
+      "user": "anonymous",
+      "dateUpdated": "Mar 13, 2018 11:35:41 AM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "ERROR",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import com.esri.core.geometry.{Geometry, GeometryEngine}\nimport spray.json._\n\u003cconsole\u003e:12: error: not found: type JsValue\n       case class Feature(id: Option[JsValue],\n                                     ^\n\u003cconsole\u003e:13: error: not found: type JsValue\n                          properties: Map[String, JsValue],\n                                                  ^\n\u003cconsole\u003e:14: error: not found: type RichGeometry\n                          geometry: RichGeometry) {\n                                    ^\n\u003cconsole\u003e:15: error: not found: type JsValue\n         def apply(property: String): JsValue \u003d properties(property)\n                                      ^\n\u003cconsole\u003e:16: error: not found: type JsValue\n         def get(property: String): Option[JsValue] \u003d properties.get(property)\n                                           ^\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1520908531362_-1103052035",
+      "id": "20180313-113531_1824780098",
+      "dateCreated": "Mar 13, 2018 11:35:31 AM",
+      "dateStarted": "Mar 13, 2018 11:35:41 AM",
+      "dateFinished": "Mar 13, 2018 11:35:42 AM",
+      "status": "ERROR",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "user": "anonymous",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1520908541141_1016160231",
+      "id": "20180313-113541_508697790",
+      "dateCreated": "Mar 13, 2018 11:35:41 AM",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "geojson",
+  "id": "2D9EFD9EB",
+  "angularObjects": {
+    "2D7WVA7DP:shared_process": [],
+    "2D8127K51:shared_process": [],
+    "2DAH8MCQQ:shared_process": [],
+    "2DA7VW7D9:shared_process": [],
+    "2D7SA3PEP:shared_process": [],
+    "2D9RY9QEZ:shared_process": [],
+    "2D96W95K3:shared_process": [],
+    "2D7J3WG1H:shared_process": [],
+    "2D9WAHUGF:shared_process": [],
+    "2D6SPY2GB:shared_process": [],
+    "2DA3DYXHT:shared_process": [],
+    "2D9XUWQTF:shared_process": [],
+    "2D94HTQW7:shared_process": [],
+    "2DA9U4RMQ:shared_process": [],
+    "2DA7SJDJD:shared_process": [],
+    "2D89ZDQ9K:shared_process": [],
+    "2DA9RTG8T:shared_process": [],
+    "2D7T1QYFQ:shared_process": [],
+    "2D83QM6FT:shared_process": []
+  },
+  "config": {},
+  "info": {}
+}

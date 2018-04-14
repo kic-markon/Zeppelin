@@ -1,0 +1,497 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\nThe following example is taken from:\nAdvanced Analytics with Spark, 2nd Edition\nby Sandy Ryza, Uri Laserson, Sean Owen and Josh Wills\n(c) O\u0027Reilly, 2017\n\nWe use the \"KDD Cup 1999 Data Set\" of network traffic data.\nThe goal is to find \"anomalous records\": such records that do not seem to fit typical usage patterns.\nRecords considered not to be threats are already labeled manually as \"normal\".\nBut we want to look only at the actual data, and find outliers, even if they were \"normal\".\n\nThe method used is K-means clustering. This notebook executes a K-means analyis as given in the book.",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThe following example is taken from:\u003cbr/\u003eAdvanced Analytics with Spark, 2nd Edition\u003cbr/\u003eby Sandy Ryza, Uri Laserson, Sean Owen and Josh Wills\u003cbr/\u003e(c) O\u0026rsquo;Reilly, 2017\u003c/p\u003e\n\u003cp\u003eWe use the \u0026ldquo;KDD Cup 1999 Data Set\u0026rdquo; of network traffic data.\u003cbr/\u003eThe goal is to find \u0026ldquo;anomalous records\u0026rdquo;: such records that do not seem to fit typical usage patterns.\u003cbr/\u003eRecords considered not to be threats are already labeled manually as \u0026ldquo;normal\u0026rdquo;.\u003cbr/\u003eBut we want to look only at the actual data, and find outliers, even if they were \u0026ldquo;normal\u0026rdquo;.\u003c/p\u003e\n\u003cp\u003eThe method used is K-means clustering. This notebook executes a K-means analyis as given in the book.\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1522317701578_785964497",
+      "id": "20180329-120141_485097632",
+      "dateCreated": "Mar 29, 2018 12:01:41 PM",
+      "dateStarted": "Mar 29, 2018 12:08:31 PM",
+      "dateFinished": "Mar 29, 2018 12:08:31 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "/*\n * Copyright 2015 and onwards Sanford Ryza, Uri Laserson, Sean Owen and Joshua Wills\n *\n * See LICENSE file for further information.\n */\n\n//package com.cloudera.datascience.kmeans\n\nimport org.apache.spark.ml.{PipelineModel, Pipeline}\nimport org.apache.spark.ml.clustering.{KMeans, KMeansModel}\nimport org.apache.spark.ml.feature.{OneHotEncoder, VectorAssembler, StringIndexer, StandardScaler}\nimport org.apache.spark.ml.linalg.{Vector, Vectors}\nimport org.apache.spark.sql.{DataFrame, SparkSession}\nimport scala.util.Random\n",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import org.apache.spark.ml.{PipelineModel, Pipeline}\nimport org.apache.spark.ml.clustering.{KMeans, KMeansModel}\nimport org.apache.spark.ml.feature.{OneHotEncoder, VectorAssembler, StringIndexer, StandardScaler}\nimport org.apache.spark.ml.linalg.{Vector, Vectors}\nimport org.apache.spark.sql.{DataFrame, SparkSession}\nimport scala.util.Random\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1522310321024_-1606078241",
+      "id": "20180329-095841_1317794312",
+      "dateCreated": "Mar 29, 2018 9:58:41 AM",
+      "dateStarted": "Mar 29, 2018 9:58:55 AM",
+      "dateFinished": "Mar 29, 2018 9:59:28 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "  val data \u003d spark.read.\n      option(\"inferSchema\", true).\n      option(\"header\", false).\n      csv(\"kddcup.data\").\n      toDF(\n        \"duration\", \"protocol_type\", \"service\", \"flag\",\n        \"src_bytes\", \"dst_bytes\", \"land\", \"wrong_fragment\", \"urgent\",\n        \"hot\", \"num_failed_logins\", \"logged_in\", \"num_compromised\",\n        \"root_shell\", \"su_attempted\", \"num_root\", \"num_file_creations\",\n        \"num_shells\", \"num_access_files\", \"num_outbound_cmds\",\n        \"is_host_login\", \"is_guest_login\", \"count\", \"srv_count\",\n        \"serror_rate\", \"srv_serror_rate\", \"rerror_rate\", \"srv_rerror_rate\",\n        \"same_srv_rate\", \"diff_srv_rate\", \"srv_diff_host_rate\",\n        \"dst_host_count\", \"dst_host_srv_count\",\n        \"dst_host_same_srv_rate\", \"dst_host_diff_srv_rate\",\n        \"dst_host_same_src_port_rate\", \"dst_host_srv_diff_host_rate\",\n        \"dst_host_serror_rate\", \"dst_host_srv_serror_rate\",\n        \"dst_host_rerror_rate\", \"dst_host_srv_rerror_rate\",\n        \"label\")\n",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "data: org.apache.spark.sql.DataFrame \u003d [duration: int, protocol_type: string ... 40 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1522310335855_-395242804",
+      "id": "20180329-095855_950844596",
+      "dateCreated": "Mar 29, 2018 9:58:55 AM",
+      "dateStarted": "Mar 29, 2018 9:59:33 AM",
+      "dateFinished": "Mar 29, 2018 9:59:57 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "  def oneHotPipeline(inputCol: String): (Pipeline, String) \u003d {\n    val indexer \u003d new StringIndexer().\n      setInputCol(inputCol).\n      setOutputCol(inputCol + \"_indexed\")\n    val encoder \u003d new OneHotEncoder().\n      setInputCol(inputCol + \"_indexed\").\n      setOutputCol(inputCol + \"_vec\")\n    val pipeline \u003d new Pipeline().setStages(Array(indexer, encoder))\n    (pipeline, inputCol + \"_vec\")\n  }\n\n",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "oneHotPipeline: (inputCol: String)(org.apache.spark.ml.Pipeline, String)\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1522310373229_1260377686",
+      "id": "20180329-095933_1957254505",
+      "dateCreated": "Mar 29, 2018 9:59:33 AM",
+      "dateStarted": "Mar 29, 2018 10:00:29 AM",
+      "dateFinished": "Mar 29, 2018 10:00:30 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": " def fitPipeline4(data: DataFrame, k: Int): PipelineModel \u003d {\n    val (protoTypeEncoder, protoTypeVecCol) \u003d oneHotPipeline(\"protocol_type\")\n    val (serviceEncoder, serviceVecCol) \u003d oneHotPipeline(\"service\")\n    val (flagEncoder, flagVecCol) \u003d oneHotPipeline(\"flag\")\n\n    // Original columns, without label / string columns, but with new vector encoded cols\n    val assembleCols \u003d Set(data.columns: _*) --\n      Seq(\"label\", \"protocol_type\", \"service\", \"flag\") ++\n      Seq(protoTypeVecCol, serviceVecCol, flagVecCol)\n    val assembler \u003d new VectorAssembler().\n      setInputCols(assembleCols.toArray).\n      setOutputCol(\"featureVector\")\n\n    val scaler \u003d new StandardScaler()\n      .setInputCol(\"featureVector\")\n      .setOutputCol(\"scaledFeatureVector\")\n      .setWithStd(true)\n      .setWithMean(false)\n\n    val kmeans \u003d new KMeans().\n      setSeed(Random.nextLong()).\n      setK(k).\n      setPredictionCol(\"cluster\").\n      setFeaturesCol(\"scaledFeatureVector\").\n      setMaxIter(40).\n      setTol(1.0e-5)\n\n    val pipeline \u003d new Pipeline().setStages(\n      Array(protoTypeEncoder, serviceEncoder, flagEncoder, assembler, scaler, kmeans))\n    pipeline.fit(data)\n  }",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "fitPipeline4: (data: org.apache.spark.sql.DataFrame, k: Int)org.apache.spark.ml.PipelineModel\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1522310428981_187205734",
+      "id": "20180329-100028_89734576",
+      "dateCreated": "Mar 29, 2018 10:00:28 AM",
+      "dateStarted": "Mar 29, 2018 10:00:52 AM",
+      "dateFinished": "Mar 29, 2018 10:00:53 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nUse the Pipeline functions to execute a K-means analysis",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eUse the Pipeline functions to execute a K-means analysis\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1522317578455_-1491515840",
+      "id": "20180329-115938_506982095",
+      "dateCreated": "Mar 29, 2018 11:59:38 AM",
+      "dateStarted": "Mar 29, 2018 12:00:26 PM",
+      "dateFinished": "Mar 29, 2018 12:00:26 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "val pipelineModel \u003d fitPipeline4(data, 180)\nval kMeansModel \u003d pipelineModel.stages.last.asInstanceOf[KMeansModel]\nval centroids \u003d kMeansModel.clusterCenters\n\nval clustered \u003d pipelineModel.transform(data)\nval threshold \u003d clustered.\n    select(\"cluster\", \"scaledFeatureVector\").as[(Int, Vector)].\n    map { case (cluster, vec) \u003d\u003e Vectors.sqdist(centroids(cluster), vec) }.\n    orderBy($\"value\".desc).take(100).last\n\nval originalCols \u003d data.columns\nval anomalies \u003d clustered.filter { row \u003d\u003e\n    val cluster \u003d row.getAs[Int](\"cluster\")\n    val vec \u003d row.getAs[Vector](\"scaledFeatureVector\")\n    Vectors.sqdist(centroids(cluster), vec) \u003e\u003d threshold\n}.select(originalCols.head, originalCols.tail:_*)\n\n",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "pipelineModel: org.apache.spark.ml.PipelineModel \u003d pipeline_9d08880093e1\nkMeansModel: org.apache.spark.ml.clustering.KMeansModel \u003d kmeans_5876d7b4c765\ncentroids: Array[org.apache.spark.ml.linalg.Vector] \u003d Array([0.0,0.0,0.0,2.0582624864080237,0.053114447736433715,0.10118361646175779,0.10063157020305862,1.0378656037767153,0.870790280446781,0.0,0.0,2.0880982848278333,1.0030336674170644E-9,0.0,0.0,0.0,0.0,0.0,2.0898844111114183,0.8653487244959256,0.0,0.0,0.0,3.9805055126830586,0.8594322114281409,2.0903035488211397,2.083158879119489,0.0440833902219915,0.0,0.15895143310727292,0.6991901992792945,0.0,0.8716605186055513,0.0,0.0,0.01609844415139254,0.8644923753696453,0.0,0.0,2.0904377046710456,0.8540515573485429,0.16274514306937152,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,67.9864736076004,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0....clustered: org.apache.spark.sql.DataFrame \u003d [duration: int, protocol_type: string ... 49 more fields]\nthreshold: Double \u003d 4661.107391425643\noriginalCols: Array[String] \u003d Array(duration, protocol_type, service, flag, src_bytes, dst_bytes, land, wrong_fragment, urgent, hot, num_failed_logins, logged_in, num_compromised, root_shell, su_attempted, num_root, num_file_creations, num_shells, num_access_files, num_outbound_cmds, is_host_login, is_guest_login, count, srv_count, serror_rate, srv_serror_rate, rerror_rate, srv_rerror_rate, same_srv_rate, diff_srv_rate, srv_diff_host_rate, dst_host_count, dst_host_srv_count, dst_host_same_srv_rate, dst_host_diff_srv_rate, dst_host_same_src_port_rate, dst_host_srv_diff_host_rate, dst_host_serror_rate, dst_host_srv_serror_rate, dst_host_rerror_rate, dst_host_srv_rerror_rate, label)\nanomalies: org.apache.spark.sql.DataFrame \u003d [duration: int, protocol_type: string ... 40 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1522310452237_1229352587",
+      "id": "20180329-100052_1071354040",
+      "dateCreated": "Mar 29, 2018 10:00:52 AM",
+      "dateStarted": "Mar 29, 2018 10:01:55 AM",
+      "dateFinished": "Mar 29, 2018 11:11:45 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nThe most outlying data row:",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThe most outlying data row:\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1522317501718_319589178",
+      "id": "20180329-115821_1313959831",
+      "dateCreated": "Mar 29, 2018 11:58:21 AM",
+      "dateStarted": "Mar 29, 2018 12:01:31 PM",
+      "dateFinished": "Mar 29, 2018 12:01:31 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": " println(anomalies.first())",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "[0,tcp,telnet,S1,145,13236,0,0,0,0,0,1,31,1,2,38,0,0,0,0,0,0,1,1,1.0,1.0,0.0,0.0,1.0,0.0,0.0,29,10,0.28,0.1,0.03,0.2,0.07,0.2,0.0,0.0,normal.]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1522310515398_112334585",
+      "id": "20180329-100155_1729024303",
+      "dateCreated": "Mar 29, 2018 10:01:55 AM",
+      "dateStarted": "Mar 29, 2018 11:45:54 AM",
+      "dateFinished": "Mar 29, 2018 11:45:57 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nThe second most anomalous one:",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThe second most anomalous one:\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1522317551609_1586075288",
+      "id": "20180329-115911_1560942503",
+      "dateCreated": "Mar 29, 2018 11:59:11 AM",
+      "dateStarted": "Mar 29, 2018 12:01:26 PM",
+      "dateFinished": "Mar 29, 2018 12:01:26 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "println(anomalies.take(2).last)",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "[9,tcp,telnet,SF,307,2374,0,0,1,0,0,1,0,1,0,1,3,1,0,0,0,0,1,1,0.0,0.0,0.0,0.0,1.0,0.0,0.0,69,4,0.03,0.04,0.01,0.75,0.0,0.0,0.0,0.0,normal.]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1522316754679_-219328016",
+      "id": "20180329-114554_1905156898",
+      "dateCreated": "Mar 29, 2018 11:45:54 AM",
+      "dateStarted": "Mar 29, 2018 11:57:52 AM",
+      "dateFinished": "Mar 29, 2018 11:57:56 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nConsider: the first (and second) outliers are both labeled \"normal\", but they are farthest from the clusters established by K-means",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/markdown",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eConsider: the first (and second) outliers are both labeled \u0026ldquo;normal\u0026rdquo;, but they are farthest from the clusters established by K-means\u003c/p\u003e\n\u003c/div\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1522316769055_1362020612",
+      "id": "20180329-114609_1566005403",
+      "dateCreated": "Mar 29, 2018 11:46:09 AM",
+      "dateStarted": "Mar 29, 2018 12:09:45 PM",
+      "dateFinished": "Mar 29, 2018 12:09:45 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "",
+      "user": "anonymous",
+      "dateUpdated": "Apr 14, 2018 8:38:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1522318185229_-714666772",
+      "id": "20180329-120945_65038779",
+      "dateCreated": "Mar 29, 2018 12:09:45 PM",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "anomaly",
+  "id": "2DBFFQEP5",
+  "angularObjects": {
+    "2D7WVA7DP:shared_process": [],
+    "2D8127K51:shared_process": [],
+    "2DAH8MCQQ:shared_process": [],
+    "2DA7VW7D9:shared_process": [],
+    "2D7SA3PEP:shared_process": [],
+    "2D9RY9QEZ:shared_process": [],
+    "2D96W95K3:shared_process": [],
+    "2D7J3WG1H:shared_process": [],
+    "2D9WAHUGF:shared_process": [],
+    "2D6SPY2GB:shared_process": [],
+    "2DA3DYXHT:shared_process": [],
+    "2D9XUWQTF:shared_process": [],
+    "2D94HTQW7:shared_process": [],
+    "2DA9U4RMQ:shared_process": [],
+    "2DA7SJDJD:shared_process": [],
+    "2D89ZDQ9K:shared_process": [],
+    "2DA9RTG8T:shared_process": [],
+    "2D7T1QYFQ:shared_process": [],
+    "2D83QM6FT:shared_process": []
+  },
+  "config": {},
+  "info": {}
+}
